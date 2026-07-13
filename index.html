@@ -121,10 +121,60 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
 }
 .reveal.is-visible{ opacity:1; transform:none; }
 
+/* Reveals em cascata dentro de grids (cards entram um após o outro) */
+.eng-grid .reveal:nth-child(2){ transition-delay: 0.14s; }
+.eng-grid .reveal:nth-child(3){ transition-delay: 0.28s; }
+.offers-grid .reveal:nth-child(2){ transition-delay: 0.16s; }
+
+/* --- SEQUÊNCIA DE ENTRADA DO HERO (ao carregar a página) --- */
+@keyframes riseIn{
+  from{ opacity:0; transform: translateY(28px); }
+  to{ opacity:1; transform:none; }
+}
+@keyframes lineRise{
+  from{ transform: translateY(112%); }
+  to{ transform:none; }
+}
+@keyframes fadeIn{
+  from{ opacity:0; }
+  to{ opacity:1; }
+}
+.anim-up{
+  opacity:0;
+  animation: riseIn 1s cubic-bezier(.16,1,.3,1) forwards;
+  animation-delay: var(--d, 0s);
+}
+.anim-fade{
+  opacity:0;
+  animation: fadeIn 1.6s ease forwards;
+  animation-delay: var(--d, 0s);
+}
+/* Revelação da headline por "máscara de linha" — assinatura editorial */
+.hero-headline .line{ display:block; overflow:hidden; }
+.hero-headline .line-inner{
+  display:block;
+  transform: translateY(112%);
+  animation: lineRise 1.1s cubic-bezier(.16,1,.3,1) forwards;
+  animation-delay: var(--d, 0s);
+}
+
+/* Selo da marca flutua suavemente na composição do hero */
+@keyframes floatY{
+  from{ transform: translateY(5px); }
+  to{ transform: translateY(-7px); }
+}
+.placeholder-composition .badge{
+  animation: floatY 5.5s ease-in-out infinite alternate;
+}
+
 @media (prefers-reduced-motion: reduce){
   html{ scroll-behavior:auto; }
   .reveal{ opacity:1; transform:none; transition:none; }
   .marquee-track{ animation:none !important; }
+  .anim-up, .anim-fade, .hero-headline .line-inner{
+    opacity:1 !important; transform:none !important; animation:none !important;
+  }
+  .placeholder-composition .badge{ animation:none !important; }
 }
 
 /* ============================================================
@@ -151,9 +201,11 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   gap: 20px;
 }
 .header-logo img{
-  height: 36px;
+  height: 52px;
   width: auto;
+  transition: height 0.4s ease;
 }
+.site-header.scrolled .header-logo img{ height: 40px; }
 .header-actions{ display:flex; align-items:center; gap:12px; }
 .header-cta{
   font-family: var(--font-mono);
@@ -233,9 +285,24 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   letter-spacing: 0.16em;
   text-transform: uppercase;
   padding: 19px 30px;
+  position:relative;
+  overflow:hidden;
   transition: transform 0.35s cubic-bezier(.16,1,.3,1), background 0.35s ease;
 }
 .btn-primary:hover{ transform: translateY(-2px); background:#fff; }
+/* brilho que varre o botão no hover */
+.btn-primary::before, .btn-submit::before{
+  content:"";
+  position:absolute; top:0; bottom:0; left:-70%;
+  width:50%;
+  transform: skewX(-18deg);
+  background: linear-gradient(105deg, transparent, rgba(10,10,10,0.10), transparent);
+  transition: left 0.7s ease;
+  pointer-events:none;
+}
+.btn-primary:hover::before{ left:130%; }
+.btn-submit::before{ background: linear-gradient(105deg, transparent, rgba(243,240,233,0.16), transparent); }
+.btn-submit:hover::before{ left:130%; }
 .btn-primary svg{ width:14px; height:14px; transition: transform 0.35s ease; }
 .btn-primary:hover svg{ transform: translateX(4px); }
 
@@ -300,9 +367,9 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
     var(--ink);
 }
 .placeholder-composition .badge{
-  width: 168px; height: 168px;
+  width: 236px; height: 236px;
   object-fit: contain;
-  opacity: 0.92;
+  opacity: 0.94;
 }
 .fold-stack{
   display:flex; flex-direction:column;
@@ -333,8 +400,8 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   .hero .wrap{ grid-template-columns:1fr; gap:44px; }
   .hero-visual{ order:-1; aspect-ratio: 4/3; }
   .hero-meta{ flex-wrap:wrap; row-gap:18px; }
-  .placeholder-composition{ gap: 20px; }
-  .placeholder-composition .badge{ width: 96px; height:96px; }
+  .placeholder-composition{ gap: 18px; }
+  .placeholder-composition .badge{ width: 120px; height:120px; }
   .fold{ height: 28px; font-size:8.5px; }
   /* evita sobreposição da legenda com a composição-placeholder */
   .hero-visual figcaption{ display:none; }
@@ -552,7 +619,10 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   display:flex;
   flex-direction:column;
   position:relative;
+  transition: transform 0.5s cubic-bezier(.16,1,.3,1), border-color 0.4s ease;
 }
+.offer-card:hover{ transform: translateY(-6px); border-color: var(--ash); }
+.offer-card.featured:hover{ border-color: var(--bone); }
 .offer-card.featured{
   border-color: var(--ash);
   background:
@@ -823,6 +893,9 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   color: var(--ash);
   max-width: 60ch;
 }
+.faq-item[open] .faq-answer{
+  animation: riseIn 0.5s cubic-bezier(.16,1,.3,1);
+}
 
 /* ============================================================
    FOOTER
@@ -840,7 +913,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   gap:24px;
 }
 .footer-brand{ display:flex; align-items:center; gap:18px; }
-.footer-brand img{ height: 72px; width:auto; }
+.footer-brand img{ height: 104px; width:auto; }
 .footer-tagline{
   font-family: var(--font-mono);
   font-size: 11px;
@@ -909,22 +982,26 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
      ============================================================ -->
 <section class="hero">
   <div class="wrap">
-    <div class="hero-copy reveal">
-      <p class="eyebrow">Lote 01 · Coleção Fundadora</p>
-      <h1 class="hero-headline">A farda diária<br>do homem de <em>alta performance.</em></h1>
-      <p class="hero-sub">
+    <div class="hero-copy">
+      <p class="eyebrow anim-up" style="--d:0.05s">Lote 01 · Coleção Fundadora</p>
+      <h1 class="hero-headline">
+        <span class="line"><span class="line-inner" style="--d:0.15s">A farda diária</span></span>
+        <span class="line"><span class="line-inner" style="--d:0.28s">do homem de <em>alta</em></span></span>
+        <span class="line"><span class="line-inner" style="--d:0.41s"><em>performance.</em></span></span>
+      </h1>
+      <p class="hero-sub anim-up" style="--d:0.55s">
         Uma peça essencial por dia. Zero decisão pela manhã.
         <strong>ALAIBASICS</strong> nasce de um único propósito: eliminar a fadiga de decisão
         do guarda-roupa masculino, com básicos de precisão técnica e caimento impecável.
       </p>
-      <div class="hero-ctas">
+      <div class="hero-ctas anim-up" style="--d:0.72s">
         <a href="#pre-venda" class="btn-primary">
           Comprar na pré-venda
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
         <a href="#form" class="btn-ghost">Entrar na lista de espera</a>
       </div>
-      <div class="hero-meta">
+      <div class="hero-meta anim-up" style="--d:0.88s">
         <div><strong>100</strong>unidades no lote</div>
         <div><strong>30.1</strong>algodão penteado</div>
         <div><strong>01</strong>peça, zero ruído</div>
@@ -934,7 +1011,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
     <!-- >>> FOTO DO PRODUTO: quando o cliente enviar a foto lifestyle vertical,
          substitua .placeholder-composition por:
          <img class="photo" src="assets/foto-lifestyle.jpg" alt="Camiseta ALAIBASICS vestida"> -->
-    <figure class="hero-visual reveal">
+    <figure class="hero-visual anim-fade" style="--d:0.35s">
       <div class="placeholder-composition">
         <img class="badge logo-img" src="assets/logo_1.png" alt="Selo ALAIBASICS">
         <div class="fold-stack" role="img" aria-label="As três cores do lote: preto, creme e cinza">
@@ -1250,6 +1327,8 @@ const CONFIG = {
   stock: { total: 100, reserved: 8 }
 };
 
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 /* ============================================================
    Header sólido ao rolar
    ============================================================ */
@@ -1257,6 +1336,19 @@ const header = document.getElementById('siteHeader');
 window.addEventListener('scroll', () => {
   header.classList.toggle('scrolled', window.scrollY > 40);
 }, { passive: true });
+
+/* ============================================================
+   Parallax sutil no visual do hero
+   ============================================================ */
+if (!prefersReduced){
+  const heroVisual = document.querySelector('.hero-visual');
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    if (y <= window.innerHeight){
+      heroVisual.style.transform = 'translateY(' + (y * 0.07).toFixed(1) + 'px)';
+    }
+  }, { passive: true });
+}
 
 /* ============================================================
    Reveal on scroll (respeita prefers-reduced-motion via CSS)
@@ -1301,12 +1393,28 @@ document.querySelectorAll('[data-buy]').forEach(el => {
 });
 
 const remaining = Math.max(0, CONFIG.stock.total - CONFIG.stock.reserved);
-document.getElementById('stockRemaining').textContent = remaining;
+const stockEl = document.getElementById('stockRemaining');
+stockEl.textContent = prefersReduced ? remaining : '0';
 document.getElementById('stockTotal').textContent = CONFIG.stock.total;
-requestAnimationFrame(() => {
+
+/* Barra + contagem animadas quando a seção do lote entra na tela */
+let stockAnimated = false;
+new IntersectionObserver((entries, obs) => {
+  if (!entries[0].isIntersecting || stockAnimated) return;
+  stockAnimated = true;
+  obs.disconnect();
+
   document.getElementById('stockFill').style.width =
     Math.min(100, (CONFIG.stock.reserved / CONFIG.stock.total) * 100) + '%';
-});
+
+  if (prefersReduced){ stockEl.textContent = remaining; return; }
+  const dur = 1200, t0 = performance.now();
+  (function tick(t){
+    const k = Math.min(1, (t - t0) / dur);
+    stockEl.textContent = Math.round(remaining * (1 - Math.pow(1 - k, 3)));
+    if (k < 1) requestAnimationFrame(tick);
+  })(t0);
+}, { threshold: 0.35 }).observe(document.querySelector('.scarcity'));
 
 /* ============================================================
    Barra CTA mobile: aparece depois que o hero sai da tela
