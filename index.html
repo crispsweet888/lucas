@@ -20,6 +20,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 
+<!-- Sem JavaScript, os elementos .reveal nunca receberiam .is-visible -->
+<noscript><style>.reveal{opacity:1 !important;transform:none !important}</style></noscript>
+
 <style>
 /* ============================================================
    ALAIBASICS — DESIGN TOKENS
@@ -121,10 +124,8 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
 }
 .reveal.is-visible{ opacity:1; transform:none; }
 
-/* Reveals em cascata dentro de grids (cards entram um após o outro) */
-.eng-grid .reveal:nth-child(2){ transition-delay: 0.14s; }
-.eng-grid .reveal:nth-child(3){ transition-delay: 0.28s; }
-.offers-grid .reveal:nth-child(2){ transition-delay: 0.16s; }
+/* Reveals em cascata: o atraso é aplicado via JS (data-stagger) para
+   não vazar transition-delay para as animações de hover dos cards. */
 
 /* --- SEQUÊNCIA DE ENTRADA DO HERO (ao carregar a página) --- */
 @keyframes riseIn{
@@ -175,6 +176,11 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
     opacity:1 !important; transform:none !important; animation:none !important;
   }
   .placeholder-composition .badge{ animation:none !important; }
+  .btn-primary::before, .btn-submit::before{ display:none; }
+  .btn-primary, .btn-ghost, .btn-submit, .offer-card, .header-cta, .mobile-cta{ transition:none; }
+  .btn-primary:hover, .btn-ghost:hover, .btn-submit:hover, .offer-card:hover{ transform:none; }
+  .stock-bar-fill{ transition:none !important; }
+  .faq-item[open] .faq-answer{ animation:none !important; }
 }
 
 /* ============================================================
@@ -331,7 +337,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   padding-top: 26px;
   border-top: 1px solid var(--ink-line);
 }
-.hero-meta div{ font-family: var(--font-mono); font-size: 11px; color: var(--stone); letter-spacing:0.05em; }
+.hero-meta div{ font-family: var(--font-mono); font-size: 11px; color: var(--ash); letter-spacing:0.05em; }
 .hero-meta strong{ display:block; color: var(--bone); font-size:20px; font-family: var(--font-display); font-weight:600; margin-bottom:4px; letter-spacing:0; }
 
 /* Visual do hero.
@@ -428,10 +434,10 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   font-size: 11px;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--stone);
+  color: var(--ash);
   white-space: nowrap;
 }
-.marquee-track span b{ color: var(--ash); font-weight:500; }
+.marquee-track span b{ color: var(--bone-dim); font-weight:500; }
 @keyframes marquee{
   from{ transform: translateX(0); }
   to{ transform: translateX(-50%); }
@@ -470,7 +476,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
 .eng-index{
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--stone);
+  color: var(--ash);
   letter-spacing: 0.1em;
   margin-bottom: 34px;
 }
@@ -490,7 +496,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   border-top: 1px solid var(--ink-line);
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--stone);
+  color: var(--ash);
   letter-spacing: 0.06em;
 }
 
@@ -544,7 +550,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   font-size: 10.5px;
   letter-spacing: 0.26em;
   text-transform: uppercase;
-  color: var(--stone);
+  color: var(--ash);
 }
 
 .scarcity-copy .eyebrow{ margin-bottom:20px; }
@@ -619,7 +625,10 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   display:flex;
   flex-direction:column;
   position:relative;
-  transition: transform 0.5s cubic-bezier(.16,1,.3,1), border-color 0.4s ease;
+  /* opacity precisa constar aqui: este shorthand substitui a transição
+     do .reveal e, sem ela, o card "pularia" para visível sem fade */
+  transition: transform 0.55s cubic-bezier(.16,1,.3,1), border-color 0.4s ease,
+              opacity 0.9s cubic-bezier(.16,1,.3,1);
 }
 .offer-card:hover{ transform: translateY(-6px); border-color: var(--ash); }
 .offer-card.featured:hover{ border-color: var(--bone); }
@@ -671,7 +680,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
 .offer-price .compare{
   font-family: var(--font-mono);
   font-size: 13px;
-  color: var(--stone);
+  color: var(--ash);
   text-decoration: line-through;
 }
 .offer-price-note{
@@ -716,7 +725,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   font-family: var(--font-mono);
   font-size: 10.5px;
   letter-spacing: 0.1em;
-  color: var(--stone);
+  color: var(--ash);
   text-transform: uppercase;
 }
 
@@ -730,7 +739,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--stone);
+  color: var(--ash);
   flex-wrap:wrap;
   text-align:center;
 }
@@ -755,6 +764,8 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   text-align:center;
 }
 .capture .eyebrow{ color: var(--stone); justify-content:center; display:flex; margin-bottom:20px; }
+/* Sobre o fundo claro, o anel de foco global (bone) ficaria invisível */
+.capture :focus-visible{ outline: 2px solid var(--void); }
 .capture h2{
   font-family: var(--font-display);
   font-weight:600;
@@ -804,6 +815,8 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
 .btn-submit{
   width:100%;
   margin-top: 8px;
+  position:relative;
+  overflow:hidden;
   background: var(--void);
   color: var(--bone);
   font-family: var(--font-mono);
@@ -918,13 +931,13 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing:0.08em;
-  color: var(--stone);
+  color: var(--ash);
   max-width: 30ch;
 }
 .footer-copy{
   font-family: var(--font-mono);
   font-size: 10.5px;
-  color: var(--stone);
+  color: var(--ash);
   letter-spacing:0.05em;
 }
 
@@ -940,9 +953,14 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   background: var(--ink-line);
   border-top: 1px solid var(--ink-line);
   transform: translateY(100%);
+  visibility: hidden; /* tira os links do fluxo de Tab enquanto a barra está oculta */
+  transition: transform 0.45s cubic-bezier(.16,1,.3,1), visibility 0s linear 0.45s;
+}
+.mobile-cta.show{
+  transform: translateY(0);
+  visibility: visible;
   transition: transform 0.45s cubic-bezier(.16,1,.3,1);
 }
-.mobile-cta.show{ transform: translateY(0); }
 .mobile-cta a{
   flex:1;
   text-align:center;
@@ -957,6 +975,16 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
 .mobile-cta .m-buy{ background: var(--bone); color: var(--void); }
 @media (max-width: 720px){
   .mobile-cta{ display:flex; }
+  /* espaço para a barra fixa não cobrir o rodapé */
+  body{ padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* Telas muito estreitas: composição do hero em escala menor
+   para nunca estourar a moldura 4/3 */
+@media (max-width: 380px){
+  .placeholder-composition{ gap: 14px; }
+  .placeholder-composition .badge{ width: 92px; height:92px; }
+  .fold{ height: 24px; }
 }
 </style>
 </head>
@@ -997,7 +1025,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
       <div class="hero-ctas anim-up" style="--d:0.72s">
         <a href="#pre-venda" class="btn-primary">
           Comprar na pré-venda
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
         <a href="#form" class="btn-ghost">Entrar na lista de espera</a>
       </div>
@@ -1060,7 +1088,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
         <p class="eng-spec">Fio 30.1 · Penteado · 180g/m²</p>
       </div>
 
-      <div class="eng-card reveal">
+      <div class="eng-card reveal" data-stagger="140">
         <p class="eng-index">Componente / 02</p>
         <svg class="eng-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v4a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V4z"/><path d="M8 12v8h8v-8"/></svg>
         <h3>Modelagem Inteligente</h3>
@@ -1068,7 +1096,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
         <p class="eng-spec">Regular fit · Caimento estruturado</p>
       </div>
 
-      <div class="eng-card reveal">
+      <div class="eng-card reveal" data-stagger="280">
         <p class="eng-index">Componente / 03</p>
         <svg class="eng-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v6M12 21v-6M4.2 8l5.2 3M14.6 13l5.2 3M4.2 16l5.2-3M14.6 11l5.2-3"/></svg>
         <h3>Estampa Toque Zero</h3>
@@ -1097,15 +1125,15 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
 
       <div class="perk-list">
         <div class="perk-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
           Numeração individual de série no lote piloto
         </div>
         <div class="perk-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
           Brinde exclusivo de pioneiro para os primeiros inscritos
         </div>
         <div class="perk-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
           Prioridade de acesso antes da abertura pública
         </div>
       </div>
@@ -1144,18 +1172,18 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
         <p class="offer-price-note" data-price-note="avulsa"></p>
         <div class="offer-specs">
           <div class="offer-spec">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
             Tamanhos P · M · G
             <span class="swatches" aria-label="Cores: preto, creme e cinza">
               <span class="swatch preto"></span><span class="swatch creme"></span><span class="swatch cinza"></span>
             </span>
           </div>
           <div class="offer-spec">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
             Numeração de série do Lote 01
           </div>
           <div class="offer-spec">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
             Algodão 30.1 penteado · 180g/m²
           </div>
         </div>
@@ -1163,7 +1191,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
         <p class="offer-foot">Pix ou cartão · Envio prioritário</p>
       </div>
 
-      <div class="offer-card featured reveal">
+      <div class="offer-card featured reveal" data-stagger="160">
         <span class="offer-tag">Mais escolhido · Kit Fundador</span>
         <h3 class="offer-name">Kit 3 Peças</h3>
         <p class="offer-desc">A semana resolvida: três essenciais do lote fundador, uma decisão a menos por dia.</p>
@@ -1174,31 +1202,31 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
         <p class="offer-price-note" data-price-note="kit"></p>
         <div class="offer-specs">
           <div class="offer-spec">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
             3 camisetas · Tamanhos P · M · G
             <span class="swatches" aria-label="Cores: preto, creme e cinza">
               <span class="swatch preto"></span><span class="swatch creme"></span><span class="swatch cinza"></span>
             </span>
           </div>
           <div class="offer-spec">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
             Melhor preço por peça do lote
           </div>
           <div class="offer-spec">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
             Brinde de pioneiro incluído
           </div>
         </div>
         <a href="#form" class="btn-primary offer-cta" data-buy="kit">
           Comprar o kit
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
         <p class="offer-foot">Pix ou cartão · Envio prioritário</p>
       </div>
     </div>
 
     <p class="payment-note">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
       Compra processada em ambiente seguro · Pix aprovado na hora · Cartão em até 12x
     </p>
   </div>
@@ -1235,9 +1263,9 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
         <button type="submit" class="btn-submit" id="submitBtn">Quero garantir minha vaga</button>
       </form>
       <p class="form-note">Sem compromisso de compra. Apenas prioridade de acesso ao Lote 01.</p>
-      <p class="form-error" id="formError">Não foi possível enviar agora. Verifique sua conexão e tente novamente.</p>
+      <p class="form-error" id="formError" role="alert">Não foi possível enviar agora. Verifique sua conexão e tente novamente.</p>
 
-      <div class="form-success" id="formSuccess">
+      <div class="form-success" id="formSuccess" role="status">
         <h3>Vaga reservada.</h3>
         <p>Você está na lista do Lote 01. Avisaremos por WhatsApp e e-mail assim que o acesso antecipado abrir.</p>
       </div>
@@ -1357,7 +1385,14 @@ const revealEls = document.querySelectorAll('.reveal');
 const io = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting){
-      entry.target.classList.add('is-visible');
+      // cascata via data-stagger (em ms) — sem transition-delay no CSS,
+      // que atrasaria também as animações de hover
+      const stagger = prefersReduced ? 0 : parseInt(entry.target.dataset.stagger || '0', 10);
+      if (stagger){
+        setTimeout(() => entry.target.classList.add('is-visible'), stagger);
+      } else {
+        entry.target.classList.add('is-visible');
+      }
       io.unobserve(entry.target);
     }
   });
@@ -1394,27 +1429,30 @@ document.querySelectorAll('[data-buy]').forEach(el => {
 
 const remaining = Math.max(0, CONFIG.stock.total - CONFIG.stock.reserved);
 const stockEl = document.getElementById('stockRemaining');
-stockEl.textContent = prefersReduced ? remaining : '0';
+// valor real desde o carregamento — nunca exibir "0/100" (leria como esgotado)
+stockEl.textContent = remaining;
 document.getElementById('stockTotal').textContent = CONFIG.stock.total;
 
-/* Barra + contagem animadas quando a seção do lote entra na tela */
+/* Barra + contagem animadas quando a barra (elemento pequeno) entra na
+   tela — observar a seção inteira falharia em viewports baixos */
 let stockAnimated = false;
 new IntersectionObserver((entries, obs) => {
   if (!entries[0].isIntersecting || stockAnimated) return;
   stockAnimated = true;
   obs.disconnect();
 
+  // a barra representa o que o rótulo diz: unidades disponíveis
   document.getElementById('stockFill').style.width =
-    Math.min(100, (CONFIG.stock.reserved / CONFIG.stock.total) * 100) + '%';
+    Math.min(100, (remaining / CONFIG.stock.total) * 100) + '%';
 
-  if (prefersReduced){ stockEl.textContent = remaining; return; }
+  if (prefersReduced) return;
   const dur = 1200, t0 = performance.now();
   (function tick(t){
     const k = Math.min(1, (t - t0) / dur);
     stockEl.textContent = Math.round(remaining * (1 - Math.pow(1 - k, 3)));
     if (k < 1) requestAnimationFrame(tick);
   })(t0);
-}, { threshold: 0.35 }).observe(document.querySelector('.scarcity'));
+}, { threshold: 0.15 }).observe(document.querySelector('.stock-bar'));
 
 /* ============================================================
    Barra CTA mobile: aparece depois que o hero sai da tela
