@@ -1,0 +1,22 @@
+# Vercel
+.vercel/
+
+# Dependências (caso use `vercel dev`)
+node_modules/
+
+# Variáveis de ambiente — nunca commitar segredos
+.env
+.env*.local
+
+# Sistema operacional
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Editores
+.vscode/
+.idea/
+
+# Logs e temporários
+*.log
+*.tmp
